@@ -1,7 +1,7 @@
 /*
  * Matthew J. Walker
  * 2 June 2017
- * Enables hardware performance monitoring counters (PMCs) on ARMv8
+ * Enables hardware performance monitoring counters (PMCs) on ARMv7 and ARMv8
  */
 
 
@@ -9,7 +9,7 @@
 #include <linux/module.h>
 #include <linux/smp.h>
 
-#define MODULE_NAME "powmon_emable_pmcs_ARMv8"
+#define MODULE_NAME "powmon_emable_pmcs"
 
 
 static void enable_pmcs(void* data)
@@ -17,10 +17,15 @@ static void enable_pmcs(void* data)
     printk(KERN_INFO "[" MODULE_NAME "] enabling PMCs on CPU %d", 
         smp_processor_id());
 #if __aarch64__
+    printk(KERN_INFO "[" MODULE_NAME "] (ARMv8)");
     /* Enable userspace access to EL1, SW inc., cycle count, counters */
 	asm volatile("msr PMUSERENR_EL0, %0" : : "r"(0x0F));
+#elif defined(__ARM_ARCH_7A__)
+    printk(KERN_INFO "[" MODULE_NAME "] (ARMv7)");
+	asm("MCR p15, 0, %0, C9, C14, 0\n\t" :: "r"(1)); //PMUSERENR
+	asm("MCR p15, 0, %0, C9, C14, 2\n\t" :: "r"(0x8000000f)); //PMINTENCLR
 #else
-#error Only ARMv8 supported
+#error This platform is not supported
 #endif
 }
 
