@@ -1,0 +1,11 @@
+
+Three use cases:
+  1) measuring total counts for an application. E.g. get counts for running 'basicmath'
+       1. start continuous (raw counts only, not rate)
+       2. take stamp at beginning
+       3. take stamp at end
+       4. post process with python
+  2) measure counts continuous. E.g. collect data for model building, etc.
+  3) measure continuous rate. E.g. run power model, PRIME
+
+Make 2 and 3 the same but with simple on/off

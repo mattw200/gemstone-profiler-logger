@@ -66,10 +66,7 @@ int main(int argc, char *argv[])
             printf("\n");
         }
         printf("\n\n");
-
     }
     sleep(1);
     return 0;
 }
-
-

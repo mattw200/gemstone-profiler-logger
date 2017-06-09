@@ -118,6 +118,39 @@ inline uint32_t get_no_counters()
     return (value>>11)&0x1F;
 }
 
+inline void set_events(int *events, int num_events)
+{
+    int num_counters = get_no_counters();
+    int i;
+    for (i = 0; i < num_events; i++) {
+        if (i>=num_counters) {
+            printf("WARNING: more events specified than counters!");
+            break;
+        }
+        set_selected_counter(i);
+        set_event_for_selected_counter(events[i]);
+    } 
+}
+
+inline void get_events(int *events)
+{
+    int num_counters = get_no_counters();
+    int i;
+    for (i = 0; i < num_counters; i++) {
+       set_selected_counter(i);
+       events[i] = get_event_for_selected_counter();
+    }
+}
+
+inline void get_counts(uint32_t *counts)
+{
+    int num_counters = get_no_counters();
+    int i;
+    for (i = 0; i < num_counters; i++) {
+       set_selected_counter(i);
+       counts[i] = get_count_for_selected_counter();
+    }
+}
 
 inline void get_six_event_ids(int *ids) 
 {
