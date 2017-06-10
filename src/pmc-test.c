@@ -6,7 +6,7 @@
 #include <sys/time.h>  
 #include <stdlib.h>
 #include <inttypes.h>
-#include "pmc-helper-64.h"
+#include "../include/pmc-helper-64.h"
 
 #include <sched.h>
 
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
         printf("Identification code: 0x%0x\n", (r>>16)&0xFF);  
         // print number of counters
         printf("Number of counters: %d\n", (r>>11)&0x1F);  
-        init_pmcs(0);
+        init_pmcs();
         asm volatile("mrs %0, PMCR_EL0" : "=r" (r)); // read again
         printf("32 or 64 overflow: %"PRIu32"\n", r);
         uint64_t cycle_count = 0;
@@ -66,7 +66,10 @@ int main(int argc, char *argv[])
             printf("\n");
         }
         printf("\n\n");
+
     }
     sleep(1);
     return 0;
 }
+
+

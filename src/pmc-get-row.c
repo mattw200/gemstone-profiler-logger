@@ -6,13 +6,13 @@
 #include <sys/time.h>  
 #include <stdlib.h>
 #include <inttypes.h>
-#include "pmc-helper-64.h"
+#include "../include/pmc-helper-64.h"
 
 #include <sched.h>
 
 #define HEADER_LEN 4096
 
-#define PLATFORM_ODROID_C2 1
+//#define PLATFORM_ODROID_C2 1
 
 int main(int argc, char *argv[])
 {
@@ -26,12 +26,19 @@ int main(int argc, char *argv[])
         exit(-1);
     }
     //TODO remove previous online/offline check and put a per-core one
+	// millisecond int
     struct timespec milt;
     clock_gettime(CLOCK_REALTIME, &milt);
     int64_t millitime = milt.tv_sec * INT64_C(1000) + milt.tv_nsec / 1000000;
+    printf("%"PRId64"",millitime);
+    // date stamp
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    char timeStamp[64];
+    printf("\t%d-%d-%d %d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
     //printf("Millitime: %f\n", (double)millitime);
     //printf("Millitime int: %"PRId64"\n", millitime);
-    printf("%"PRId64"",millitime);
     //char header[HEADER_LEN];
     int i = 0;
     for (i = 0; i < num_cpus; i++) {
@@ -43,8 +50,11 @@ int main(int argc, char *argv[])
         uint32_t num_counters = get_no_counters();
         num_counters = get_no_counters();
         uint32_t counts[num_counters];
+        uint32_t cycle_count = get_cycle_count();
         get_counts(&counts[0]);
+        printf("\t%"PRIu32"", cycle_count);
         //char field[512];
+        // get cycle count
         int p;
         for (p = 0; p < num_counters; p++) {
             //sprintf(field, "\t%sCPU %d cntr %d (0x%02X)", field, i, p, counts[p]);
@@ -52,7 +62,6 @@ int main(int argc, char *argv[])
             printf("\t%"PRIu32"",  counts[p]);
         }
         //strcpy(header, field); 
-
     }
 #ifdef PLATFORM_ODROID_C2
     // add temperature

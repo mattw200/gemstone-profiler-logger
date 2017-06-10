@@ -6,13 +6,12 @@
 #include <sys/time.h>  
 #include <stdlib.h>
 #include <inttypes.h>
-#include "pmc-helper-64.h"
+#include "../include/pmc-helper-64.h"
 
 #include <sched.h>
 
-#define EVENTS_CONFIG_FILENAME "events.config"
+#define EVENTS_CONFIG_FILENAME "../events.config"
 
-#define EVENT_ARRAY_LEN 10
 
 void get_user_events(unsigned int cpu_id, int *events)
 {
@@ -55,6 +54,7 @@ void get_user_events(unsigned int cpu_id, int *events)
 
 int main(int argc, char *argv[])
 {
+
     // get number of CPUs (both offline and online)
     unsigned long num_cpus = sysconf (_SC_NPROCESSORS_CONF);
     unsigned long online_cpus = sysconf (_SC_NPROCESSORS_ONLN);
@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
         unsigned int len = sizeof(mask);
         int result = sched_setaffinity(0, len, &mask);
         //printf("Core: %d, Result: %d\n", i, result);
+        init_pmcs();
         uint32_t cpuid = get_cpu_id_code();
         uint32_t num_counters = get_no_counters();
         //printf("Core: %d, id: %u, no. counters: %u\n", i, cpuid, num_counters);
