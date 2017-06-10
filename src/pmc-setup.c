@@ -64,6 +64,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "FATAL ERROR: Some CPUs are offline. All must be online for setup.\n");
         exit(-1);
     }
+
+    FILE *cpu_data = fopen("cpu-data.csv", "w");  
     int i = 0;
     for (i = 0; i < num_cpus; i++) {
         unsigned long mask = 0 | (1<<i); //cpu 0
@@ -73,6 +75,7 @@ int main(int argc, char *argv[])
         init_pmcs();
         uint32_t cpuid = get_cpu_id_code();
         uint32_t num_counters = get_no_counters();
+		fprintf(cpu_data, "%d\n", num_counters);
         //printf("Core: %d, id: %u, no. counters: %u\n", i, cpuid, num_counters);
         int user_events[EVENT_ARRAY_LEN];
         get_user_events(cpuid, &user_events[0]);
@@ -101,8 +104,8 @@ int main(int argc, char *argv[])
             printf("0x%02X, ", events_check[p]);
         }
         printf("\n");
-        
     }
+    fclose(cpu_data);
     return 0;
 }
 

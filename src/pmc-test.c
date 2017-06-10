@@ -12,7 +12,6 @@
 
 #define NUM_CORES 4
 
-
 int main(int argc, char *argv[])
 {
     int i;

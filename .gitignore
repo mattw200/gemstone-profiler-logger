@@ -2,3 +2,9 @@
 *.o
 bin/
 *.swp
+*.ko
+.*
+*.cmd
+Module.symvers
+module.order
+*.mod.c

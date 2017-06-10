@@ -14,6 +14,49 @@
 
 //#define PLATFORM_ODROID_C2 1
 
+int is_cpu_online(int cpu_num) 
+{
+    char filename[128];
+    sprintf(filename, "/sys/devices/system/cpu/cpu%d/online", cpu_num);
+    FILE *online_check = fopen(filename, "r");  
+    if (online_check == NULL) {	
+         //error 
+         printf("FATAL ERROR: could not open cpu online file\n");
+         exit(-1);
+    }
+    char online_buffer [8];
+    fread(online_buffer, 1, 8, online_check);
+    fclose(online_check);		
+    return atoi(online_buffer);  
+}
+
+/* 
+ * If the cpu is offline, then the software can't access the 
+ * registers of the cpu to determine the number of counters
+ * (needed to print the correct number of columns). 
+ * Therefore, it uses a file with them recorded in 
+ * (file created by pmc-setup
+ */
+int get_num_counters_from_file(int cpu_num)
+{
+    FILE *cpu_data = fopen("cpu-data.csv", "r");  
+    if (cpu_data == NULL) {
+        printf("FATAL ERROR: could not open cpu-data.csv\n");
+        exit(-1);
+    }
+    char line[8];
+    int count = 0;
+    int num_counters = 0;
+    while (fgets(line, sizeof(line), cpu_data)) {
+        if (count == cpu_num) {
+            return atoi(line); 
+        }
+        count++;
+    }
+    printf("FATAL ERROR: cpu not found in cpu-data.csv file\n");
+    exit(-1);
+}
+
 int main(int argc, char *argv[])
 {
     // get number of CPUs (both offline and online)
@@ -25,7 +68,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "FATAL ERROR: Some CPUs are offline. All must be online for setup.\n");
         exit(-1);
     }
-    //TODO remove previous online/offline check and put a per-core one
 	// millisecond int
     struct timespec milt;
     clock_gettime(CLOCK_REALTIME, &milt);
@@ -42,6 +84,16 @@ int main(int argc, char *argv[])
     //char header[HEADER_LEN];
     int i = 0;
     for (i = 0; i < num_cpus; i++) {
+        // test is cpu is online or offline
+        if (!is_cpu_online(i)) {
+            // get cpu stats from setup
+            unsigned int counters = get_num_counters_from_file(i);
+            int j = 0;
+            for (j = 0; j < counters; j++) {
+                printf("\t-1");
+            }
+            continue;
+        }
         unsigned long mask = 0 | (1<<i); //cpu 0
         unsigned int len = sizeof(mask);
         int result = sched_setaffinity(0, len, &mask);
