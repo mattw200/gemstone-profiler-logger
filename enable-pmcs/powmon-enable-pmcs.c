@@ -4,13 +4,11 @@
  * Enables hardware performance monitoring counters (PMCs) on ARMv7 and ARMv8
  */
 
-
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/smp.h>
 
 #define MODULE_NAME "powmon_emable_pmcs"
-
 
 static void enable_pmcs(void* data)
 {
