@@ -46,8 +46,7 @@ inline void set_selected_counter(int counter)
     //pmnxsel |= (counter & 0x03); 
     pmnxsel &= ~(0x1F);
     pmnxsel |= (counter & 0x1F); 
-    writePMNXSEL(pmnxsel);
-	asm volatile("MCR p15, 0, %0, c9, c12, 5\t\n" :: "r"(pmnxsel));
+    asm volatile("MCR p15, 0, %0, c9, c12, 5\t\n" :: "r"(pmnxsel));
 
 #else
 #error This platform is not supported

@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
         printf("\tCPU %d (id:0x%02X) cycle count", i, cpuid);
         int p;
         for (p = 0; p < num_counters; p++) {
-			printf("\tCPU %d (id:0x%02X) cntr %d (0x%02X)", i, cpuid, p, events[p]);
+            printf("\tCPU %d (id:0x%02X) cntr %d (0x%02X)", i, cpuid, p, events[p]);
         }
     }
 #ifdef PLATFORM_ODROID_C2

@@ -57,13 +57,12 @@ int get_num_counters_from_file(int cpu_num)
     exit(-1);
 }
 
-int main(int argc, char *argv[])
-{
+void pmc_get_row() {
     // get number of CPUs (both offline and online)
     unsigned long num_cpus = sysconf (_SC_NPROCESSORS_CONF);
     unsigned long online_cpus = sysconf (_SC_NPROCESSORS_ONLN);
-    printf("number of CPUs configured: %lu\n", num_cpus);
-    printf("number of CPUs online: %lu\n", num_cpus);
+    //printf("number of CPUs configured: %lu\n", num_cpus);
+    //printf("number of CPUs online: %lu\n", num_cpus);
     if (num_cpus != online_cpus) {
         fprintf(stderr, "FATAL ERROR: Some CPUs are offline. All must be online for setup.\n");
         exit(-1);
@@ -131,6 +130,5 @@ int main(int argc, char *argv[])
     printf("\t%d", c2_temperature/1000);
 #endif
     printf("\n");
-    //printf("%s\n", header);
-    return 0;
 }
+
