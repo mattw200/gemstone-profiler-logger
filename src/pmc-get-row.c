@@ -57,7 +57,7 @@ int get_num_counters_from_file(int cpu_num)
     exit(-1);
 }
 
-void pmc_get_row() {
+void pmc_get_row(char* row_label) {
     // get number of CPUs (both offline and online)
     unsigned long num_cpus = sysconf (_SC_NPROCESSORS_CONF);
     unsigned long online_cpus = sysconf (_SC_NPROCESSORS_ONLN);
@@ -77,7 +77,7 @@ void pmc_get_row() {
     struct tm tm = *localtime(&t);
     char timeStamp[64];
     printf("\t%d-%d-%d %d:%d:%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-
+    printf("\t%s", row_label);
     //printf("Millitime: %f\n", (double)millitime);
     //printf("Millitime int: %"PRId64"\n", millitime);
     //char header[HEADER_LEN];

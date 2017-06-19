@@ -44,8 +44,9 @@ int main(int argc, char *argv[])
     } 
     system("./pmc-get-header");
     system("echo '1' > "CHECK_FILENAME"");
+    char label[64] = "log";
     while(1) {
-        pmc_get_row();
+        pmc_get_row(&label[0]);
         if (!check_stopfile())
             break;
         usleep(sample_period);            

@@ -1,0 +1,14 @@
+Compilation
+===========
+
+
+Use Precompiled Module
+======================
+
+Copy the precompiled LKM and remove the postix:
+    cp powmon-enable-pmcs.ko.precompiled powmon-enable-pmcs.ko
+
+Use modprobe to force insert the LKM (needs to be forced becuase
+ it is compiled with a different kernel)
+    modprobe -f powmon-enable-pmcs.ko
+

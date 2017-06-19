@@ -8,3 +8,7 @@ bin/
 Module.symvers
 module.order
 *.mod.c
+powmon-experiment-*
+scripts
+cpu-data.csv
+PMC_RUN_CHECK

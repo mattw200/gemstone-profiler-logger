@@ -10,8 +10,7 @@
 
 #include <sched.h>
 
-#define EVENTS_CONFIG_FILENAME "../events.config"
-
+#define EVENTS_CONFIG_FILENAME "events.config"
 
 void get_user_events(unsigned int cpu_id, int *events)
 {
@@ -54,7 +53,6 @@ void get_user_events(unsigned int cpu_id, int *events)
 
 int main(int argc, char *argv[])
 {
-
     // get number of CPUs (both offline and online)
     unsigned long num_cpus = sysconf (_SC_NPROCESSORS_CONF);
     unsigned long online_cpus = sysconf (_SC_NPROCESSORS_ONLN);
@@ -64,8 +62,11 @@ int main(int argc, char *argv[])
         fprintf(stderr, "FATAL ERROR: Some CPUs are offline. All must be online for setup.\n");
         exit(-1);
     }
-
     FILE *cpu_data = fopen("cpu-data.csv", "w");  
+    if (cpu_data == NULL) {
+        fprintf(stderr, "FATAL ERROR: Could not open cpu-data file\n");
+        exit(-1);
+    }
     int i = 0;
     for (i = 0; i < num_cpus; i++) {
         unsigned long mask = 0 | (1<<i); //cpu 0

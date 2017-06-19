@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "FATAL ERROR: Some CPUs are offline. All must be online for setup.\n");
         exit(-1);
     }
-	printf("milliseconds\tdatetime");
+	printf("milliseconds\tdatetime\tlabel");
     int i = 0;
     for (i = 0; i < num_cpus; i++) {
         unsigned long mask = 0 | (1<<i); //cpu 0

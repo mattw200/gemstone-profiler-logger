@@ -9,3 +9,7 @@ Three use cases:
   3) measure continuous rate. E.g. run power model, PRIME
 
 Make 2 and 3 the same but with simple on/off
+
+sudo ./run-single-wl-experiment.py -m '0,1,2,3,4,5,6,7' -c workloads.config.armv7 -f 1200
+
+All programs (binaries and scripts) should be run from the 'powmon-pmc-arm/' directory.
