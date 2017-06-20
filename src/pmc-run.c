@@ -36,13 +36,13 @@ int main(int argc, char *argv[])
     int sample_period = 0;
     if( argc != 2 ) {
         printf("Expects one argument!\n");
-        printf("USAGE: pmc-run [sample period in ms]\n");
+        printf("USAGE: pmc-run [sample period in us]\n");
         printf("E.g.: pmc-run 500000\n");
         exit(0);
     } else {
 	sample_period = atoi(argv[1]); 
     } 
-    system("./pmc-get-header");
+    system("./bin/pmc-get-header");
     system("echo '1' > "CHECK_FILENAME"");
     char label[64] = "log";
     while(1) {

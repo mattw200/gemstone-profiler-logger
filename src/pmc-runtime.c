@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     int sample_period = 0;
     if( argc != 2 ) {
         printf("Expects one argument!\n");
-        printf("USAGE: pmc-runtime [sample period in ms]\n");
+        printf("USAGE: pmc-runtime [sample period in us]\n");
         printf("E.g.: pmc-runtime 500000\n");
         exit(0);
     } else {
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
                         // overflow. 
                         delta_pmcs = (double)cur_pmc_values[i] + (pow(2, 32) - (double)pre_pmc_values[i]);
                     }
-                    sprintf(new_columns, "%s%f\t", new_columns, delta_pmcs);
+                    sprintf(new_columns, "%s%f\t", new_columns, delta_pmcs/delta_time);
                 } else {
                     sprintf(new_columns, "%soffline\t", new_columns);
                 }

@@ -14,6 +14,22 @@
 
 //#define PLATFORM_ODROID_C2 1
 
+
+float get_value_from_file(char* filepath)
+{
+    float value;
+    FILE *tempFile = fopen(filepath, "r");  
+    if (tempFile == NULL) {   
+        printf("FATAL ERROR: opening file %s\n",filepath);
+        exit(1);
+    }
+    char buffer [16];
+    fread(buffer, 1, 16, tempFile);
+    value = atof(buffer);
+    fclose(tempFile);
+    return value;
+}
+
 int is_cpu_online(int cpu_num) 
 {
     char filename[128];
@@ -114,6 +130,22 @@ void pmc_get_row(char* row_label) {
         }
         //strcpy(header, field); 
     }
+    /* Get CPU frequnecy
+     * Typically the frequency of a quad-cluster is the same
+     * Therefore, only need freq of CPU 0, 4, 8, 16 etc.
+     */
+    for (i = 0; i < num_cpus; i++) {
+        if (i == 0) {
+            printf("\t%f",
+                    get_value_from_file(&"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq"[0])/1000);
+        } else if (i == 4) {
+            printf("\t%f",
+                    get_value_from_file(&"/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_cur_freq"[0])/1000);
+        } else if (i == 8) {
+            printf("\t%f",
+                    get_value_from_file(&"/sys/devices/system/cpu/cpu8/cpufreq/cpuinfo_cur_freq"[0])/1000);
+        }
+    }
 #ifdef PLATFORM_ODROID_C2
     // add temperature
     int c2_temperature = -1;
@@ -128,6 +160,56 @@ void pmc_get_row(char* row_label) {
     }
     //sprintf(header, "%s\t%f", header, c2_temperature);
     printf("\t%d", c2_temperature/1000);
+#endif
+#ifdef PLATFORM_ODROID_XU3
+    float powerA7 = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0045/sensor_W"[0]);
+    float powerA15 = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0040/sensor_W"[0]);
+    float powerMemory = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0041/sensor_W"[0]);
+    float powerGPU = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0044/sensor_W"[0]);
+    float voltageA7 = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0045/sensor_V"[0]);
+    float voltageA15 = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0040/sensor_V"[0]);
+    float voltageMemory = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0041/sensor_V"[0]);
+    float voltageGPU = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0044/sensor_V"[0]);
+    float temperature[5] = {-1.0f, -1.0f, -1.0f, -1.0f, -1.0f};
+    FILE *temperature_file = fopen("/sys/devices/10060000.tmu/temp", "r");
+    if (temperature_file == NULL) {
+        printf("FATAL ERROR: can't open temperature file\n");
+        exit(-1);
+    }
+    char buf[128] = {0};
+    int line_count = 0;
+    while (fgets(buf,1000, temperature_file)!=NULL) {
+        //printf("BUF: %s\n",buf); //e.g. BUF: sensor0 : 54000
+        //split using ':'
+        int c;
+        for (c = 0; c < strlen(buf); c++) {
+            if (buf[c] == ':') {
+                int d;
+                char num_only[16] = {0};
+                for (d = c+1; d < strlen(buf); d++) {
+                    num_only[d-c-1] = buf[d];
+                }
+                //printf("Temperature %d: %s\n", line_count, num_only);
+                temperature[line_count] = atof(num_only);
+            }
+        }
+        line_count++;
+    }
+    printf("\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f", 
+            powerA7,
+            powerA15,
+            powerMemory,
+            powerGPU,
+            voltageA7,
+            voltageA15,
+            voltageMemory,
+            voltageGPU,
+            temperature[0],
+            temperature[1],
+            temperature[2],
+            temperature[3],
+            temperature[4]
+          );
 #endif
     printf("\n");
 }

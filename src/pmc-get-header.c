@@ -42,8 +42,40 @@ int main(int argc, char *argv[])
             printf("\tCPU %d (id:0x%02X) cntr %d (0x%02X)", i, cpuid, p, events[p]);
         }
     }
+    /* Add headers for frequency */
+    for (i = 0; i < num_cpus; i++) {
+        if (i == 0) {
+            printf("\tFreq (MHz) C0");
+        } else if (i == 4) {
+            printf("\tFreq (MHz) C4");
+        } else if (i == 8) {
+            printf("\tFreq (MHz) C8");
+        }
+    }
 #ifdef PLATFORM_ODROID_C2
     printf("\tcluster temperature");
+#endif
+#ifdef PLATFORM_ODROID_XU3
+    /* Initialise power sensors */
+    FILE *out = fopen("/sys/bus/i2c/drivers/INA231/3-0045/enable", "w");  
+    fprintf(out, "1");  
+    fclose(out);  
+
+    out = fopen("/sys/bus/i2c/drivers/INA231/3-0040/enable", "w");  
+    fprintf(out, "1");  
+    fclose(out);  
+
+    out = fopen("/sys/bus/i2c/drivers/INA231/3-0041/enable", "w");  
+    fprintf(out, "1");  
+    fclose(out);  
+
+    out = fopen("/sys/bus/i2c/drivers/INA231/3-0044/enable", "w");  
+    fprintf(out, "1");  
+    fclose(out); 
+    printf("\tPower A7 (W)\tPower A15 (W)\tPower Mem (W)\tPower GPU (W)");
+    printf("\tVoltage A7 (V)\tVoltageA15 (V)\tVoltage Mem (V)\tVoltage GPU (V)");
+    printf("\tTemperature C0\tTemperature C1\tTemperature C2\tTemperature C3");
+    printf("\tTemperature GPU");
 #endif
 
     printf("\n");

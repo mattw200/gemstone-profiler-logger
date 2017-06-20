@@ -5,8 +5,12 @@ DEPS=pmc-helper-64.h pmc-get-row.h
 BIN=../bin
 
 all: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
+
 odroid_c2: CFLAGS += -DPLATFORM_ODROID_C2
-odroid_c2: $(BIN)/pmc-test $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
+odroid_c2: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
+
+odroid_xu3: CFLAGS += -DPLATFORM_ODROID_XU3
+odroid_xu3: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
 
 $(BIN)/pmc-runtime: pmc-runtime.o pmc-get-row.o pmc-helper-64.o 
 	$(CC) -o $@ $^ $(CLFAGS)

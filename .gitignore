@@ -10,5 +10,6 @@ module.order
 *.mod.c
 powmon-experiment-*
 scripts
+powmon-scripts
 cpu-data.csv
 PMC_RUN_CHECK

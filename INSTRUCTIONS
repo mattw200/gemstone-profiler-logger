@@ -13,3 +13,7 @@ Make 2 and 3 the same but with simple on/off
 sudo ./run-single-wl-experiment.py -m '0,1,2,3,4,5,6,7' -c workloads.config.armv7 -f 1200
 
 All programs (binaries and scripts) should be run from the 'powmon-pmc-arm/' directory.
+
+Check permission on temperature for XU3!
+
+Note that if the program was stopped, the last line may not be complete so might have to be deleted before opening as a CSV file.
