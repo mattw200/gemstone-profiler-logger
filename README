@@ -47,6 +47,27 @@ make odroid_xu3
 
 Make sure a 'make clean' is done before compiling with a different option. 
 
+ENABLING PMCs
+=============
+
+IMPORTANT: PMCs must be enabled after each reboot. 
+
+Go to enable_pmcs directory and make the kernel model (requires kernel source). 
+It works on ARMv7 and ARMv8 and with any CPU. 
+TODO: add more details on how to compile. 
+
+Can force a module to be loaded TODO: add more details on this.
+Already a precompiled LKM for ARMv8 (powmon-enable-pmcs.ko.precompiled.armv8).
+This can be force loaded on ARMv8.
+
+There is not one (yet) for ARMv7, but there is a specific XU3 and XU4 
+precompiled LKM (perf.ko.precompiled.xu3). (Hardcoded as 8-core, taken from
+the powmon online LKM).
+
+For XU3/XU4:
+mv perf.ko.precompiled.xu3 perf.ko
+sudo insmod perf.ko
+
 
 USAGE - general
 ===============
