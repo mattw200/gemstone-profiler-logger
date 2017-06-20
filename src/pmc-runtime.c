@@ -38,7 +38,7 @@ int check_stopfile()
     return 0;
 }
 
-double read_pmc_data(int* pmc_indexes, int* is_offline, uint32_t* pmc_values)
+double read_pmc_data(int* pmc_indexes, int* is_offline, uint32_t* pmc_values, char* row_string)
 {
     double time_ms = -1.0f;
     char line[4096];
@@ -67,10 +67,12 @@ double read_pmc_data(int* pmc_indexes, int* is_offline, uint32_t* pmc_values)
                     pmc_values[field_count] = strtoul(pch, NULL, 0);
                 }
             }
+            sprintf(row_string, "%s%s\t", row_string, pch);
             pch = strtok (NULL, "\t");
             field_count++;
         }
     }
+    fclose(file);
     return time_ms;
 }
 
@@ -109,6 +111,9 @@ int main(int argc, char *argv[])
             sprintf(old_headers, "%s%s\t", old_headers, pch);
             if ( (strstr(pch, "cycle count") != NULL) ||  (strstr(pch, "cntr") != NULL)) {
                 // found a heading that is a PMC or cycle count 
+                if (pch[strlen(pch) - 1] == '\n') {
+                    pch[strlen(pch) -1] = 0;
+                }
                 sprintf(new_headers, "%s\t%s rate", new_headers, pch);
                 pmc_indexes[count] = 1;
                 h++;
@@ -120,16 +125,19 @@ int main(int argc, char *argv[])
         }
     }
     fclose(temp);
+    /* for debug:
     int i = 0;
     for (i = 0; i < h; i++) {
         printf("%d,",pmc_indexes[i]);
     }
+    */
     //remove '\n' from old headers
     //old_headers[strlen(old_headers) -2] = 0;
     old_headers[strlen(old_headers) -2] = 0;
-    printf("\n%s%s\n", old_headers, new_headers); //print all headers (old + new)
+    printf("%s%s\n", old_headers, new_headers); //print all headers (old + new)
     system("echo '1' > "CHECK_FILENAME"");
     char label[64] = "log";
+    int i;
     while(1) {
         /* Steps in this bit:
          * 1) Read last saved PMCs from file
@@ -142,24 +150,30 @@ int main(int argc, char *argv[])
          */
         // 'pre' used to identify variables for previously saved PMCs (i.e. last sample)
         // 'cur' used to identify variables for current PMCs (i.e. current sample)
-        uint32_t pre_pmc_values[MAX_FIELDS]; //used to save numerical pmc_values
-        int pre_is_offline[MAX_FIELDS];
+        uint32_t pre_pmc_values[MAX_FIELDS] = {0}; //used to save numerical pmc_values
+        int pre_is_offline[MAX_FIELDS] = {0};
         // read the temp-pmc-row.csv' file
-        double pre_time_ms = read_pmc_data(pmc_indexes, pre_is_offline, pre_pmc_values);
+        char pre_row_string[4096] = {0};
+        double pre_time_ms = read_pmc_data(&pmc_indexes[0], &pre_is_offline[0], &pre_pmc_values[0], &pre_row_string[0]);
+        /* for debug:
         for (i = 0; i < 64; i++) { //should be MAX_FIELDS (not 64) but easier to see
             printf("%d: %"PRIu32" %d\n", i, pre_pmc_values[i], pre_is_offline[i]);
         }
+        */
         system("bin/pmc-get-pmcs log > temp-pmc-row.csv");
-        uint32_t cur_pmc_values[MAX_FIELDS]; //used to save numerical pmc_values
-        int cur_is_offline[MAX_FIELDS];
-        double cur_time_ms = read_pmc_data(pmc_indexes, cur_is_offline, cur_pmc_values);
+        uint32_t cur_pmc_values[MAX_FIELDS] = {0}; //used to save numerical pmc_values
+        int cur_is_offline[MAX_FIELDS] = {0};
+        char cur_row_string[4096] = {0};
+        double cur_time_ms = read_pmc_data(&pmc_indexes[0], &cur_is_offline[0], &cur_pmc_values[0], &cur_row_string[0]);
+        /* for debug:
         for (i = 0; i < 64; i++) {
             printf("%d: %"PRIu32" %d\n", i, cur_pmc_values[i], cur_is_offline[i]);
         }
+        */
         double delta_time = (cur_time_ms - pre_time_ms)/1000000.0f;
-        printf("Time 1: %f, Time 2: %f, delta_s: %f\n", pre_time_ms, cur_time_ms, delta_time);
+        //printf("Time 1: %f, Time 2: %f, delta_s: %f\n", pre_time_ms, cur_time_ms, delta_time);
         // now go through each pmc and find the rate
-        char new_columns[2048];
+        char new_columns[4096] = {0};
         for (i = 0; i < MAX_FIELDS; i++) {
             if (pmc_indexes[i] ) {
                 // this field is a pmc/cycle count field
@@ -179,11 +193,12 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        printf("%s\n",new_columns);
-        break;
+        cur_row_string[strlen(cur_row_string) -2] = 0; //remove the tailing '\n'
+        new_columns[strlen(new_columns) -1] = 0; // remove the trailing \t
+        printf("%s\t%s\n",cur_row_string, new_columns);
         usleep(sample_period);            
-        if (!check_stopfile())
-            break;
+        //if (!check_stopfile())
+            //break;
     }
     return 0;
 }
