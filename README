@@ -2,6 +2,9 @@
 POWMON-PMC
 ==========
 
+Project created: 02 June 2017
+Matthew J. Walker <mattw200@mac.com>
+
 OVERVIEW
 ========
 This project collects performance counters (PMCs) and other stats (e.g. CPU
