@@ -26,7 +26,7 @@ int check_stopfile()
     char check_buffer[1];
     fread(check_buffer, 1, 1, check);
     fclose(check);
-    if (check_buffer[0] = '1')
+    if (check_buffer[0] == '1')
         return 1;
     return 0;
 }
