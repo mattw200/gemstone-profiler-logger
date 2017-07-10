@@ -21,13 +21,16 @@ int check_stopfile()
 {
     FILE *check = fopen(CHECK_FILENAME, "r");  
     if (check == NULL) {	
+        printf("NULL\n");
         return 0;
     }
     char check_buffer[1];
     fread(check_buffer, 1, 1, check);
     fclose(check);
+    check = NULL;
     if (check_buffer[0] == '1')
         return 1;
+    printf("NOT 1\n");
     return 0;
 }
 

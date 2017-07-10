@@ -65,6 +65,7 @@ int get_num_counters_from_file(int cpu_num)
     int num_counters = 0;
     while (fgets(line, sizeof(line), cpu_data)) {
         if (count == cpu_num) {
+            fclose(cpu_data);
             return atoi(line); 
         }
         count++;
@@ -195,6 +196,7 @@ void pmc_get_row(char* row_label) {
         }
         line_count++;
     }
+    fclose(temperature_file);
     printf("\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f", 
             powerA7,
             powerA15,
