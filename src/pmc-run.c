@@ -30,7 +30,7 @@ int check_stopfile()
     check = NULL;
     if (check_buffer[0] == '1')
         return 1;
-    printf("NOT 1\n");
+    //printf("NOT 1\n");
     return 0;
 }
 
