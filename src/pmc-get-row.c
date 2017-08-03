@@ -12,8 +12,26 @@
 
 #define HEADER_LEN 4096
 
+//#define NO_FREQ 1
+//#define NO_OFFLINE_CHECK 1
+
 //#define PLATFORM_ODROID_C2 1
 
+int get_int_value_from_file(char* filepath)
+{
+    int value;
+    FILE *tempFile = fopen(filepath, "r");  
+    if (tempFile == NULL) {   
+        printf("FATAL ERROR: opening file %s\n",filepath);
+        exit(1);
+    }
+    char buffer [16];
+    fread(buffer, 1, 16, tempFile);
+    value = atoi(buffer);
+    fclose(tempFile);
+    return value;
+
+}
 
 float get_value_from_file(char* filepath)
 {
@@ -77,6 +95,7 @@ int get_num_counters_from_file(int cpu_num)
 void pmc_get_row(char* row_label) {
     // get number of CPUs (both offline and online)
     unsigned long num_cpus = sysconf (_SC_NPROCESSORS_CONF);
+#ifndef NO_OFFLINE_CHECK
     unsigned long online_cpus = sysconf (_SC_NPROCESSORS_ONLN);
     //printf("number of CPUs configured: %lu\n", num_cpus);
     //printf("number of CPUs online: %lu\n", num_cpus);
@@ -84,6 +103,7 @@ void pmc_get_row(char* row_label) {
         fprintf(stderr, "FATAL ERROR: Some CPUs are offline. All must be online for setup.\n");
         exit(-1);
     }
+#endif
 	// millisecond int
     struct timespec milt;
     clock_gettime(CLOCK_REALTIME, &milt);
@@ -100,6 +120,7 @@ void pmc_get_row(char* row_label) {
     //char header[HEADER_LEN];
     int i = 0;
     for (i = 0; i < num_cpus; i++) {
+#ifndef NO_OFFLINE_CHECK
         // test is cpu is online or offline
         if (!is_cpu_online(i)) {
             // get cpu stats from setup
@@ -110,6 +131,7 @@ void pmc_get_row(char* row_label) {
             }
             continue;
         }
+#endif
         unsigned long mask = 0 | (1<<i); //cpu 0
         unsigned int len = sizeof(mask);
         int result = sched_setaffinity(0, len, &mask);
@@ -135,18 +157,23 @@ void pmc_get_row(char* row_label) {
      * Typically the frequency of a quad-cluster is the same
      * Therefore, only need freq of CPU 0, 4, 8, 16 etc.
      */
+#ifndef NO_FREQ
     for (i = 0; i < num_cpus; i++) {
         if (i == 0) {
-            printf("\t%f",
-                    get_value_from_file(&"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq"[0])/1000);
+            printf("\t%d",
+                    //get_value_from_file(&"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq"[0])/1000);
+                    get_int_value_from_file(&"/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"[0])/1000);
         } else if (i == 4) {
-            printf("\t%f",
-                    get_value_from_file(&"/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_cur_freq"[0])/1000);
+            printf("\t%d",
+                    //get_value_from_file(&"/sys/devices/system/cpu/cpu4/cpufreq/cpuinfo_cur_freq"[0])/1000);
+                    get_int_value_from_file(&"/sys/devices/system/cpu/cpu4/cpufreq/scaling_cur_freq"[0])/1000);
         } else if (i == 8) {
-            printf("\t%f",
-                    get_value_from_file(&"/sys/devices/system/cpu/cpu8/cpufreq/cpuinfo_cur_freq"[0])/1000);
+            printf("\t%d",
+                    //get_value_from_file(&"/sys/devices/system/cpu/cpu8/cpufreq/cpuinfo_cur_freq"[0])/1000);
+                    get_int_value_from_file(&"/sys/devices/system/cpu/cpu8/cpufreq/scaling_cur_freq"[0])/1000);
         }
     }
+#endif
 #ifdef PLATFORM_ODROID_C2
     // add temperature
     int c2_temperature = -1;

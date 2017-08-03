@@ -6,6 +6,9 @@ BIN=../bin
 
 all: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
 
+no_freq: CFLAGS += -DNO_FREQ
+no_freq: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
+
 odroid_c2: CFLAGS += -DPLATFORM_ODROID_C2
 odroid_c2: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
 
