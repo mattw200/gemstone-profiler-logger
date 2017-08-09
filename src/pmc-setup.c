@@ -12,10 +12,10 @@
 
 #define EVENTS_CONFIG_FILENAME "events.config"
 
-void get_user_events(unsigned int cpu_id, int *events)
+void get_user_events(unsigned int cpu_id, int *events, char* events_config_filename)
 {
     FILE *config_file;
-    config_file = fopen(EVENTS_CONFIG_FILENAME, "r");
+    config_file = fopen(events_config_filename, "r");
     if (config_file == NULL) {
         fprintf(stderr, "FATAL ERROR: Could not open file: %s\n", EVENTS_CONFIG_FILENAME);
         exit(-1);
@@ -79,7 +79,11 @@ int main(int argc, char *argv[])
 		fprintf(cpu_data, "%d\n", num_counters);
         //printf("Core: %d, id: %u, no. counters: %u\n", i, cpuid, num_counters);
         int user_events[EVENT_ARRAY_LEN];
-        get_user_events(cpuid, &user_events[0]);
+        if (argc == 2) {
+            get_user_events(cpuid, &user_events[0], argv[1]);
+        } else {
+            get_user_events(cpuid, &user_events[0], EVENTS_CONFIG_FILENAME);
+        }
         int specified_events = 0;
         int p = 0;
         //printf("Events: \n");
