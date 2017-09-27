@@ -1,3 +1,8 @@
+//#define _GNU_SOURCE
+#include <stdio.h>
+#include <unistd.h>
+#include <sched.h>
+
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -55,8 +60,10 @@ int is_cpu_online(int cpu_num)
     FILE *online_check = fopen(filename, "r");  
     if (online_check == NULL) {	
          //error 
-         printf("FATAL ERROR: could not open cpu online file\n");
-         exit(-1);
+         //printf("FATAL ERROR: could not open cpu online file\n");
+         //exit(-1);
+	 // SOME PLATFORMS DO NOT HAVE THIS FILE, ASSUME CPU IS ONLINE
+	 return 1;
     }
     char online_buffer [8];
     fread(online_buffer, 1, 8, online_check);
@@ -174,6 +181,10 @@ void pmc_get_row(char* row_label) {
         }
     }
 #endif
+#ifdef PLATFORM_RPI3
+    int rpi_temperature = get_int_value_from_file("/sys/class/thermal/thermal_zone0/temp");
+    printf("\t%d", rpi_temperature);
+#endif
 #ifdef PLATFORM_ODROID_C2
     // add temperature
     int c2_temperature = -1;
@@ -187,7 +198,7 @@ void pmc_get_row(char* row_label) {
         fclose(temp_file);		
     }
     //sprintf(header, "%s\t%f", header, c2_temperature);
-    printf("\t%d", c2_temperature/1000);
+    printf("\t%d", c2_temperature);
 #endif
 #ifdef PLATFORM_ODROID_XU3
     float powerA7 = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0045/sensor_W"[0]);

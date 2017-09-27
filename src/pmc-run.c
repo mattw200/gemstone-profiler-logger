@@ -52,7 +52,12 @@ int main(int argc, char *argv[])
         pmc_get_row(&label[0]);
         if (!check_stopfile())
             break;
-        usleep(sample_period);            
+        //usleep(sample_period);            
+	struct timespec tim;
+        tim.tv_sec = 0;
+	tim.tv_nsec = sample_period*1000.0;
+	nanosleep(&tim , NULL);
+
     }
     return 0;
 }

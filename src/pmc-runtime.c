@@ -196,9 +196,10 @@ int main(int argc, char *argv[])
         cur_row_string[strlen(cur_row_string) -2] = 0; //remove the tailing '\n'
         new_columns[strlen(new_columns) -1] = 0; // remove the trailing \t
         printf("%s\t%s\n",cur_row_string, new_columns);
-        usleep(sample_period);            
-        //if (!check_stopfile())
-            //break;
+	struct timespec tim;
+        tim.tv_sec = 0;
+	tim.tv_nsec = sample_period*1000.0;
+	nanosleep(&tim , NULL);
     }
     return 0;
 }

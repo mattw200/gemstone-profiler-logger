@@ -15,6 +15,9 @@ odroid_c2: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-
 odroid_xu3: CFLAGS += -DPLATFORM_ODROID_XU3
 odroid_xu3: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
 
+rpi3: CFLAGS += -DPLATFORM_RPI3
+rpi3: $(BIN)/pmc-run $(BIN)/pmc-setup $(BIN)/pmc-get-header $(BIN)/pmc-get-pmcs $(BIN)/pmc-runtime
+
 $(BIN)/pmc-runtime: pmc-runtime.o pmc-get-row.o pmc-helper-64.o 
 	$(CC) -o $@ $^ $(CLFAGS)
 

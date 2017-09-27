@@ -52,8 +52,11 @@ int main(int argc, char *argv[])
             printf("\tFreq (MHz) C8");
         }
     }
+#ifdef PLATFORM_RPI3
+    printf("\tCluster 0 temperature (RPi3)");
+#endif
 #ifdef PLATFORM_ODROID_C2
-    printf("\tcluster temperature");
+    printf("\tCluster 0 temperature (O-C2)");
 #endif
 #ifdef PLATFORM_ODROID_XU3
     /* Initialise power sensors */
@@ -72,10 +75,10 @@ int main(int argc, char *argv[])
     out = fopen("/sys/bus/i2c/drivers/INA231/3-0044/enable", "w");  
     fprintf(out, "1");  
     fclose(out); 
-    printf("\tPower A7 (W)\tPower A15 (W)\tPower Mem (W)\tPower GPU (W)");
-    printf("\tVoltage A7 (V)\tVoltageA15 (V)\tVoltage Mem (V)\tVoltage GPU (V)");
-    printf("\tTemperature C0\tTemperature C1\tTemperature C2\tTemperature C3");
-    printf("\tTemperature GPU");
+    printf("\tPower A7 (W) (O-XU3)\tPower A15 (W) (O-XU3)\tPower Mem (W) (O-XU3)\tPower GPU (W) (O-XU3)");
+    printf("\tVoltage A7 (V) (O-XU3)\tVoltageA15 (V) (O-XU3)\tVoltage Mem (V) (O-XU3)\tVoltage GPU (V) (O-XU3)");
+    printf("\tTemperature C0 (O-XU3)\tTemperature C1 (O-XU3)\tTemperature C2 (O-XU3)\tTemperature C3 (O-XU3)");
+    printf("\tTemperature GPU (O-XU3)");
 #endif
 
     printf("\n");

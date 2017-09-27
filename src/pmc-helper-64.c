@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "../include/pmc-helper-64.h"
 
-inline void init_pmcs()
+ void init_pmcs()
 {
 	// in general enable all counters
 	int32_t value = 1;
@@ -26,12 +26,17 @@ inline void init_pmcs()
 	asm volatile("MCR p15, 0, %0, c9, c12, 0\t\n" :: "r"(value));
 	asm volatile("MCR p15, 0, %0, c9, c12, 1\t\n" :: "r"(0x8000003f));
 	asm volatile("MCR p15, 0, %0, c9, c12, 3\t\n" :: "r"(0x8000003f));
+#elif __arm__
+	// program the performace-counter control-register
+	asm volatile("MCR p15, 0, %0, c9, c12, 0\t\n" :: "r"(value));
+	asm volatile("MCR p15, 0, %0, c9, c12, 1\t\n" :: "r"(0x8000003f));
+	asm volatile("MCR p15, 0, %0, c9, c12, 3\t\n" :: "r"(0x8000003f));
 #else
 #error This platform is not supported
 #endif
 }
 
-inline void set_selected_counter(int counter)
+ void set_selected_counter(int counter)
 {
 #if __aarch64__
 	unsigned long pmselr;
@@ -47,29 +52,40 @@ inline void set_selected_counter(int counter)
     pmnxsel &= ~(0x1F);
     pmnxsel |= (counter & 0x1F); 
     asm volatile("MCR p15, 0, %0, c9, c12, 5\t\n" :: "r"(pmnxsel));
-
+#elif __arm__
+    unsigned long pmnxsel;
+	asm volatile("MRC p15, 0, %0, c9, c12, 5\t\n" : "=r"(pmnxsel));
+    //pmnxsel &= ~(0x03);
+    //pmnxsel |= (counter & 0x03); 
+    pmnxsel &= ~(0x1F);
+    pmnxsel |= (counter & 0x1F); 
+    asm volatile("MCR p15, 0, %0, c9, c12, 5\t\n" :: "r"(pmnxsel));
 #else
 #error This platform is not supported
 #endif
 }
 
-inline void set_event_for_selected_counter(int event_id) 
+ void set_event_for_selected_counter(int event_id) 
 {
 #if __aarch64__
     asm volatile("msr PMXEVTYPER_EL0, %0" : : "r" (event_id));
 #elif defined(__ARM_ARCH_7A__)
+    asm volatile("MCR p15, 0, %0, c9, c13, 1\t\n" :: "r"(event_id));
+#elif __arm__
     asm volatile("MCR p15, 0, %0, c9, c13, 1\t\n" :: "r"(event_id));
 #else
 #error This platform is not supported
 #endif
 }
 
-inline int get_event_for_selected_counter() 
+ int get_event_for_selected_counter() 
 {
     int event = 0;
 #if __aarch64__
     asm volatile("mrs %0, PMXEVTYPER_EL0" : "=r" (event));
 #elif defined(__ARM_ARCH_7A__)
+	asm volatile ("MRC p15, 0, %0, c9, c13, 1\t\n" : "=r"(event));
+#elif __arm__
 	asm volatile ("MRC p15, 0, %0, c9, c13, 1\t\n" : "=r"(event));
 #else
 #error This platform is not supported
@@ -77,7 +93,7 @@ inline int get_event_for_selected_counter()
     return event;
 }
 
-inline uint32_t get_count_for_selected_counter()
+ uint32_t get_count_for_selected_counter()
 {
     // Warning: it is a 32-bit register
     uint32_t value = 0;
@@ -85,18 +101,22 @@ inline uint32_t get_count_for_selected_counter()
     asm volatile("mrs %0, PMXEVCNTR_EL0" : "=r" (value));
 #elif defined(__ARM_ARCH_7A__)
 	asm volatile("MRC p15, 0, %0, c9, c13, 2\t\n" : "=r"(value));
+#elif __arm__
+	asm volatile("MRC p15, 0, %0, c9, c13, 2\t\n" : "=r"(value));
 #else
 #error This platform is not supported
 #endif
     return value;
 }
 
-inline uint32_t get_cycle_count() 
+ uint32_t get_cycle_count() 
 {
     uint32_t value;
 #if __aarch64__
     asm volatile("mrs %0, PMCCNTR_EL0" : "=r" ((uint32_t)value));
 #elif defined(__ARM_ARCH_7A__)
+    asm volatile("MRC p15, 0, %0, c9, c13, 0\t\n" : "=r"(value));
+#elif __arm__
     asm volatile("MRC p15, 0, %0, c9, c13, 0\t\n" : "=r"(value));
 #else
 #error This platform is not supported
@@ -104,12 +124,14 @@ inline uint32_t get_cycle_count()
     return value;
 }
 
-inline uint32_t get_cpu_id_code()
+ uint32_t get_cpu_id_code()
 {
     uint32_t value = 0;
 #if __aarch64__
     asm volatile("mrs %0, PMCR_EL0" : "=r" (value));
 #elif defined(__ARM_ARCH_7A__)
+	asm volatile("MRC p15, 0, %0, c9, c12, 0\t\n" : "=r"(value));
+#elif __arm__
 	asm volatile("MRC p15, 0, %0, c9, c12, 0\t\n" : "=r"(value));
 #else
 #error This platform is not supported
@@ -117,12 +139,14 @@ inline uint32_t get_cpu_id_code()
     return (value>>16)&0xFF;
 }
 
-inline uint32_t get_no_counters() 
+ uint32_t get_no_counters() 
 {
     uint32_t value = 0;
 #if __aarch64__
     asm volatile("mrs %0, PMCR_EL0" : "=r" (value));
 #elif defined(__ARM_ARCH_7A__)
+	asm volatile("MRC p15, 0, %0, c9, c12, 0\t\n" : "=r"(value));
+#elif __arm__
 	asm volatile("MRC p15, 0, %0, c9, c12, 0\t\n" : "=r"(value));
 #else
 #error This platform is not supported
@@ -130,7 +154,7 @@ inline uint32_t get_no_counters()
     return (value>>11)&0x1F;
 }
 
-inline void set_events(int *events, int num_events)
+ void set_events(int *events, int num_events)
 {
     int num_counters = get_no_counters();
     int i;
@@ -144,7 +168,7 @@ inline void set_events(int *events, int num_events)
     } 
 }
 
-inline void get_events(int *events)
+ void get_events(int *events)
 {
     int num_counters = get_no_counters();
     int i;
@@ -154,7 +178,8 @@ inline void get_events(int *events)
     }
 }
 
-inline void get_counts(uint32_t *counts)
+
+ void get_counts(uint32_t *counts)
 {
     int num_counters = get_no_counters();
     int i;
@@ -164,7 +189,7 @@ inline void get_counts(uint32_t *counts)
     }
 }
 
-inline void get_six_event_ids(int *ids) 
+ void get_six_event_ids(int *ids) 
 {
     int i;
     for (i = 0; i <6; i++) {
@@ -173,7 +198,7 @@ inline void get_six_event_ids(int *ids)
     }
 }
 
-inline void get_six_counts(int *counts) 
+ void get_six_counts(int *counts) 
 {
     int i;
     for (i = 0; i <6; i++) {
@@ -182,7 +207,7 @@ inline void get_six_counts(int *counts)
     }
 }
 
-inline void set_six_event_ids(int events[6]) 
+ void set_six_event_ids(int events[6]) 
 {
     int i;
     for (i = 0; i < 6; i++) {

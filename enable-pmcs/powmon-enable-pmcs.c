@@ -22,6 +22,10 @@ static void enable_pmcs(void* data)
     printk(KERN_INFO "[" MODULE_NAME "] (ARMv7)");
 	asm("MCR p15, 0, %0, C9, C14, 0\n\t" :: "r"(1)); //PMUSERENR
 	asm("MCR p15, 0, %0, C9, C14, 2\n\t" :: "r"(0x8000000f)); //PMINTENCLR
+#elif __arm__
+    printk(KERN_INFO "[" MODULE_NAME "] (ARMv7)");
+	asm("MCR p15, 0, %0, C9, C14, 0\n\t" :: "r"(1)); //PMUSERENR
+	asm("MCR p15, 0, %0, C9, C14, 2\n\t" :: "r"(0x8000000f)); //PMINTENCLR
 #else
 #error This platform is not supported
 #endif
