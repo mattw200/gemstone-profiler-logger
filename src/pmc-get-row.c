@@ -209,7 +209,7 @@ void pmc_get_row(char* row_label) {
     float voltageA15 = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0040/sensor_V"[0]);
     float voltageMemory = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0041/sensor_V"[0]);
     float voltageGPU = get_value_from_file(&"/sys/bus/i2c/drivers/INA231/3-0044/sensor_V"[0]);
-    float temperature[5] = {-1.0f, -1.0f, -1.0f, -1.0f, -1.0f};
+    int temperature[5] = {-1, -1, -1, -1, -1};
     FILE *temperature_file = fopen("/sys/devices/10060000.tmu/temp", "r");
     if (temperature_file == NULL) {
         printf("FATAL ERROR: can't open temperature file\n");
@@ -229,13 +229,13 @@ void pmc_get_row(char* row_label) {
                     num_only[d-c-1] = buf[d];
                 }
                 //printf("Temperature %d: %s\n", line_count, num_only);
-                temperature[line_count] = atof(num_only);
+                temperature[line_count] = atoi(num_only);
             }
         }
         line_count++;
     }
     fclose(temperature_file);
-    printf("\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f", 
+    printf("\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%d\t%d\t%d\t%d", 
             powerA7,
             powerA15,
             powerMemory,
