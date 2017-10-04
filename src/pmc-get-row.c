@@ -235,7 +235,8 @@ void pmc_get_row(char* row_label) {
         line_count++;
     }
     fclose(temperature_file);
-    printf("\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%d\t%d\t%d\t%d", 
+    int fan_pwm =  get_int_value_from_file("/sys/devices/odroid_fan.14/pwm_duty");
+    printf("\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%d\t%d\t%d\t%d\t%d", 
             powerA7,
             powerA15,
             powerMemory,
@@ -248,7 +249,8 @@ void pmc_get_row(char* row_label) {
             temperature[1],
             temperature[2],
             temperature[3],
-            temperature[4]
+            temperature[4],
+            fan_pwm
           );
 #endif
     printf("\n");

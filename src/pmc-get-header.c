@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
     printf("\tVoltage A7 (V) (O-XU3)\tVoltageA15 (V) (O-XU3)\tVoltage Mem (V) (O-XU3)\tVoltage GPU (V) (O-XU3)");
     printf("\tTemperature C0 (O-XU3)\tTemperature C1 (O-XU3)\tTemperature C2 (O-XU3)\tTemperature C3 (O-XU3)");
     printf("\tTemperature GPU (O-XU3)");
+    printf("\tFan Speed (O-XU3)");
 #endif
 
     printf("\n");
