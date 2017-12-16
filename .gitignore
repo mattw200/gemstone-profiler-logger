@@ -11,5 +11,6 @@ module.order
 powmon-experiment-*
 scripts
 powmon-scripts
+gemstone-profiler-automate
 cpu-data.csv
 PMC_RUN_CHECK
