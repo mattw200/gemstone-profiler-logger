@@ -54,14 +54,14 @@ int main(int argc, char *argv[])
             break;
         //usleep(sample_period);            
 	struct timespec tim;
-        // sample period is in ms
-        if (sample_period > 999) {
-            tim.tv_sec = (int)(sample_period / 1000); 
-            tim.tv_nsec = (sample_period - ((long)tim.tv_sec * 1000)) * 1000000;
+        // sample period is in us
+        if (sample_period > 999999) {
+            tim.tv_sec = (int)(sample_period / 1000000); 
+            tim.tv_nsec = (sample_period - ((long)tim.tv_sec * 1000000)) * 1000;
         }
         else {
             tim.tv_sec = 0;
-            tim.tv_nsec = sample_period * 1000000;
+            tim.tv_nsec = sample_period * 1000;
         }
 	nanosleep(&tim , NULL);
     }
