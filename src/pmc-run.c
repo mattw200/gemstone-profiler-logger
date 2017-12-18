@@ -36,14 +36,14 @@ int check_stopfile()
 
 int main(int argc, char *argv[])
 {
-    int sample_period = 0;
+    long sample_period = 0;
     if( argc != 2 ) {
         printf("Expects one argument!\n");
         printf("USAGE: pmc-run [sample period in us]\n");
         printf("E.g.: pmc-run 500000\n");
         exit(0);
     } else {
-	sample_period = atoi(argv[1]); 
+	sample_period = atol(argv[1]); 
     } 
     system("./bin/pmc-get-header");
     system("echo '1' > "CHECK_FILENAME"");
@@ -54,10 +54,16 @@ int main(int argc, char *argv[])
             break;
         //usleep(sample_period);            
 	struct timespec tim;
-        tim.tv_sec = 0;
-	tim.tv_nsec = sample_period*1000.0;
+        // sample period is in ms
+        if (sample_period > 999) {
+            tim.tv_sec = (int)(sample_period / 1000); 
+            tim.tv_nsec = (sample_period - ((long)tim.tv_sec * 1000)) * 1000000;
+        }
+        else {
+            tim.tv_sec = 0;
+            tim.tv_nsec = sample_period * 1000000;
+        }
 	nanosleep(&tim , NULL);
-
     }
     return 0;
 }
