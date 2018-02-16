@@ -1,12 +1,11 @@
-==========
-POWMON-PMC
-==========
+# GemStone-Profiler Logger
+--------------------------
 
 Project created: 02 June 2017
 Matthew J. Walker <mattw200@mac.com>
 
-OVERVIEW
-========
+## Overview
+----------
 This project collects performance counters (PMCs) and other stats (e.g. CPU
 frequency, temperature (if supported), power measurements (if supported). 
 
@@ -32,25 +31,29 @@ For high-level experiment running and post-processing scripts:
 clone 'powmon-scripts' into top project directory. 
 (git@bitbucket.org:matt-walker/powmon-scripts.git)
 
-COMPILING
-=========
+## Compiling
+-----------
 To make the basic version:
+```
 cd src
 make
+```
 
 Some platforms have temperature sensors, power sensors, etc.
 Sensors for specific platforms (currently ODROID C2 and XU3) are supported
 and can be enabled by compiling with the 'odroid_c2' or 'odroid_xu3' option. 
 
 E.g. 
+```
 make odroid_xu3
+```
 
 Make sure a 'make clean' is done before compiling with a different option. 
 
-ENABLING PMCs
-=============
+## Enabling PMCs
+--------------
 
-IMPORTANT: PMCs must be enabled after each reboot. 
+**IMPORTANT:** PMCs must be enabled after each reboot. 
 
 Go to enable_pmcs directory and make the kernel model (requires kernel source). 
 It works on ARMv7 and ARMv8 and with any CPU. 
@@ -65,12 +68,14 @@ precompiled LKM (perf.ko.precompiled.xu3). (Hardcoded as 8-core, taken from
 the powmon online LKM).
 
 For XU3/XU4:
+```
 mv perf.ko.precompiled.xu3 perf.ko
+```
 sudo insmod perf.ko
 
 
-USAGE - general
-===============
+## Usage - general
+------------------
 
 The original main purpose of this software is to record data for experiments 
 (e.g. logging the data in a raw format and post-processing later). 
@@ -95,24 +100,28 @@ The original main purpose of this software is to record data for experiments
 2. Run PMC setup
 
    From the top directory of the project, run:
+   ```
    ./bin/pmc-setup
+   ```
 
    This sets the registers in the PMU (performance monitoring unit) to
    the correct values and sets the specified PMC events. 
 
    (It also derives the CPU configuration [e.g how many cores, the core type
    and the number of counters each core has] and saves it to file 
-   [cpu-data.csv]. This is used when a core is 
+   [`cpu-data.csv`]. This is used when a core is 
    offline; when a core is offline the number of counters can't be read from 
    the CPU registers, and so this file is used instead to insert the correct
    number of columns in the results). 
 
-   NOTE: all CPUs must be online when running pmc-setup
+   **NOTE:** all CPUs must be online when running pmc-setup
 
 3. Get the column headings
 
    The header row of the results is obtained by running:
+   ```
    ./bin/pmc-get-header
+   ```
 
    The output is a tab-separated CSV file header row.
 
@@ -134,13 +143,17 @@ The original main purpose of this software is to record data for experiments
 4. Read (instantaneous) PMCs (and optionally sensor data, freq etc.)
 
    Running:
+   ```
    sudo ./bin/pmc-get-pmcs
+   ```
 
    Optionally, another argument can be specified, acting as a label in the
    results. E.g.:
+   ```
    sudo ./bin/pmc-get-pmcs "whetstone start"
+   ```
 
-   sudo is required for reading /sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_cur_freq
+   sudo is required for reading `/sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_cur_freq`
    and possibly other sensor files (platform-dependent). 
 
    An example of the output from this program is shown in: 'get-pmcs-pmcs-output.example'
@@ -155,16 +168,19 @@ The original main purpose of this software is to record data for experiments
 5. Continuously log PMCs. 
 
    To get continuous samples of the PMCs:
+   ```
    sudo ./bin/pmc-run 100000
+   ```
 
    The argument is the sample period in microseconds. 
 
    
-USAGE - recording experiments
-=============================
+## Usage - recording experiments
+--------------------------------
 (Example)
  
   Create two output files: one for logging events, one for a continuous sample
+  ```
   ./bin/pmc-setup
   sudo ./bin/pmc-run 100000 > continuous.csv
   ./bin/pmc-get-header > events.csv
@@ -172,6 +188,7 @@ USAGE - recording experiments
   /* RUN BASICMATH
   ./bin/pmcs-get-pmcs "basicmath finish" >> events.csv
   ./bin/pmcs-get-pmcs "bitcount start" >> events.csv
+  ```
   etc.
   
   The results are in two tab-separated CSV files, ready to be post processed.
@@ -180,8 +197,8 @@ USAGE - recording experiments
   file. Delete the last line of this file to solve this. 
   
 
-USAGE - runtime data
-====================
+## Usage - runtime data
+----------------------
 An example program has been created to provide run-time PMC output using the
 previously described programs. 
 
@@ -192,7 +209,9 @@ It provides all of the output of the previous programs, but adds extra columns
 for each PMC (and cycle count) column where the rate for that PMC is given. 
 
 Usage:
+  ```
   sudo ./bin/pmc-runtime 100000
+  ```
 
 (pmc-setup still needs to be run beforehand)
 
@@ -200,8 +219,8 @@ Note that if the pmc-runtime is stopped, the final sample (last line in csv file
 may not have completed, and therefore may confuse software opening the csv
 file. Delete the last line of this file to solve this. 
 
-More Notes on Runtime Capture
-=============================
+## More Notes on Runtime Capture
+-------------------------------
 The pmc-runtime program uses the existing logging applications and makes it
 work for runtime. (i.e. using the programs to output the numbers to file 
 (as text) and then reading it back, decoding, convert to float, etc.
@@ -225,7 +244,11 @@ if it is required and the interface would remain unchanged. Even better (in
 terms of efficiency), the runtime could use the code directly and be compiled 
 together (i.e. no writing to file and reading back). 
 
-AUTHORS
-=======
-Matthew J. Walker
-Contact: mw9g09@ecs.soton.ac.uk, mattw200@mac.com
+## Authors
+----------
+Matthew Walker - [University of Southampton](https://www.southampton.ac.uk)
+
+## License
+----------
+This project is licensed under the 3-clause BSD license. See LICENSE.md for details.
+
