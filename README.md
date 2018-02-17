@@ -2,7 +2,9 @@
 --------------------------
 
 Project created: 02 June 2017
-Matthew J. Walker <mattw200@mac.com>
+Matthew J. Walker [mailto:mattw200@mac.com]
+
+More details, instructions and tutorials available at [GemStone](https://gemstone.ecs.soton.ac.uk)
 
 ## Overview
 ----------
