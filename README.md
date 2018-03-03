@@ -2,9 +2,14 @@
 --------------------------
 
 Project created: 02 June 2017
-Matthew J. Walker [mailto:mattw200@mac.com]
+[Matthew J. Walker](mailto:mw9g09@ecs.soton.ac.uk)
 
-More details, instructions and tutorials available at [GemStone](https://gemstone.ecs.soton.ac.uk)
+More details, instructions and tutorials available at [GemStone](http://gemstone.ecs.soton.ac.uk)
+
+You may also be interested in the [GemStone-Profiler-Automate](http://gemstone.ecs.soton.ac.uk) project,
+which uses this project and automates the process of running workloads (at specified, CPU rates and 
+core masks) while collecting Performance Counters (PMCs) (and optionally temperature, power etc.) 
+and handles experiment repetition to collect many PMC events, and to ensure experiment consistency. 
 
 ## Overview
 ----------
@@ -29,9 +34,10 @@ cluster frequency
 (C2, RPi3) CPU temperature
 (runtime) PMC rate
 
-For high-level experiment running and post-processing scripts:
-clone 'powmon-scripts' into top project directory. 
-(git@bitbucket.org:matt-walker/powmon-scripts.git)
+**NOTE:** While this is a standalone project, it is designed to work with 
+the [GemStone-Profiler-Automate](http://gemstone.ecs.soton.ac.uk) project, 
+which uses this project to automate the running of workloads on an Arm-based platform. 
+
 
 ## Compiling
 -----------
@@ -61,13 +67,13 @@ Go to enable_pmcs directory and make the kernel model (requires kernel source).
 It works on ARMv7 and ARMv8 and with any CPU. 
 TODO: add more details on how to compile. 
 
-Can force a module to be loaded TODO: add more details on this.
-Already a precompiled LKM for ARMv8 (powmon-enable-pmcs.ko.precompiled.armv8).
+Can force a module to be loaded (**TODO:** add more details on this coming soon...).
+There is already a precompiled LKM for ARMv8 (`powmon-enable-pmcs.ko.precompiled.armv8`).
 This can be force loaded on ARMv8.
 
 There is not one (yet) for ARMv7, but there is a specific XU3 and XU4 
-precompiled LKM (perf.ko.precompiled.xu3). (Hardcoded as 8-core, taken from
-the powmon online LKM).
+precompiled LKM (`perf.ko.precompiled.xu3`). (Hardcoded as 8-core, taken from
+the [powmon](http://www.powmon.ecs.soton.ac.uk) online LKM).
 
 For XU3/XU4:
 ```
@@ -130,7 +136,7 @@ The original main purpose of this software is to record data for experiments
    As well as printing the header row of the results to follow, it also provides
    information on the platform and confirms the PMC event selection (they are 
    read back from hardware). An example of the output of this program is found 
-   in the 'header.example' file. Each PMC column heading looks like:
+   in the `header.example` file. Each PMC column heading looks like:
    CPU 0 (id:0x07) cntr 3 (0x04)
    - CPU 0: means it is CPU 0. 
    - (id:0x07): identifies the type of CPU (e.g. Cortex-A7 in this case). The 
@@ -158,7 +164,7 @@ The original main purpose of this software is to record data for experiments
    sudo is required for reading `/sys/devices/system/cpu/cpu*/cpufreq/cpuinfo_cur_freq`
    and possibly other sensor files (platform-dependent). 
 
-   An example of the output from this program is shown in: 'get-pmcs-pmcs-output.example'
+   An example of the output from this program is shown in: `get-pmcs-pmcs-output.example`
 
    The pmc-get-pmcs gives an instantaneous snapshot of the time, CPU frequency
    and the PMCs. However, the PMC registers overflow. Therefore, just sampling
@@ -248,7 +254,17 @@ together (i.e. no writing to file and reading back).
 
 ## Authors
 ----------
-Matthew Walker - [University of Southampton](https://www.southampton.ac.uk)
+[Matthew J. Walker](mailto:mw9g09@ecs.soton.ac.uk) - [University of Southampton](https://www.southampton.ac.uk)
+
+This project supports the paper:
+>M. J. Walker, S. Bischoff, S. Diestelhorst, G V. Merrett, and B M. Al-Hashimi,
+>["Hardware-Validated CPU Performance and Energy Modelling"](http://www.ispass.org/ispass2018/),
+>in IEEE International Symposium on Performance Analysis of Systems and Software (ISPASS), 
+> Belfast, Northern Ireland, UK, April, 2018 [Accepted]
+
+This work is supported by [Arm Research](https://developer.arm.com/research), 
+[EPSRC](https://www.epsrc.ac.uk), and the [PRiME Project](http://www.prime-project.org).
+
 
 ## License
 ----------
