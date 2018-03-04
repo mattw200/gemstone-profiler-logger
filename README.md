@@ -6,7 +6,7 @@ Project created: 02 June 2017
 
 More details, instructions and tutorials available at [GemStone](http://gemstone.ecs.soton.ac.uk)
 
-You may also be interested in the [GemStone-Profiler-Automate](http://gemstone.ecs.soton.ac.uk) project,
+You may also be interested in the [GemStone-Profiler-Automate](https://github.com/mattw200/gemstone-profiler-automate) project,
 which uses this project and automates the process of running workloads (at specified, CPU rates and 
 core masks) while collecting Performance Counters (PMCs) (and optionally temperature, power etc.) 
 and handles experiment repetition to collect many PMC events, and to ensure experiment consistency. 
@@ -35,7 +35,7 @@ cluster frequency
 (runtime) PMC rate
 
 **NOTE:** While this is a standalone project, it is designed to work with 
-the [GemStone-Profiler-Automate](http://gemstone.ecs.soton.ac.uk) project, 
+the [GemStone-Profiler-Automate](https://github.com/mattw200/gemstone-profiler-automate) project, 
 which uses this project to automate the running of workloads on an Arm-based platform. 
 
 
