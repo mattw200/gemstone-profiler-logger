@@ -1,8 +1,9 @@
 # GemStone-Profiler Logger
---------------------------
 
 Project created: 02 June 2017
 [Matthew J. Walker](mailto:mw9g09@ecs.soton.ac.uk)
+
+This project records hardware performance counters (PMCs) (and power, voltage and temperature depending on the platform) for ARMv7 and ARMv8 platforms.
 
 More details, instructions and tutorials available at [GemStone](http://gemstone.ecs.soton.ac.uk)
 
@@ -12,27 +13,27 @@ core masks) while collecting Performance Counters (PMCs) (and optionally tempera
 and handles experiment repetition to collect many PMC events, and to ensure experiment consistency. 
 
 ## Overview
-----------
+
 This project collects performance counters (PMCs) and other stats (e.g. CPU
-frequency, temperature (if supported), power measurements (if supported). 
+frequency, temperature, power measurements, if supported). 
 
 This project works on both ARMv7 and ARMv8 (64-bit) platforms and with varying
 CPU configurations (detects the CPU types and number of counters at run-time).
 It also supports monitoring different PMCs for different CPU types. 
 
-The main purpose of this project is to record PMCs for experiments. However, it 
+The main purpose of this project is to record PMCs for experiments with very log overhead. However, it 
 has been extended to also work for run-time purposes (e.g. calculates the
  PMC rate) and handles counter overflows at run-time (see USAGE - runtime data). 
 
-Collects:
-PMC data and cycle count,
-time stamp in milliseconds
-datetime stamp
-cluster frequency
-(xu3) little cluster, big cluster, GPU, memory voltage/power
-(xu3) per-(big)core temperature, GPU temperature
-(C2, RPi3) CPU temperature
-(runtime) PMC rate
+It collects:
+* PMC events and the cycle count (per core),
+* time stamp in milliseconds
+* datetime stamp
+* cluster frequency
+* (ODROID-XU3) little cluster, big cluster, GPU, memory voltage/power
+* (ODROID-XU3) per-(big)core temperature, GPU temperature
+* (ODROID-C2, RPi3) CPU temperature
+* (runtime) PMC rate
 
 **NOTE:** While this is a standalone project, it is designed to work with 
 the [GemStone-Profiler-Automate](https://github.com/mattw200/gemstone-profiler-automate) project, 
@@ -40,7 +41,7 @@ which uses this project to automate the running of workloads on an Arm-based pla
 
 
 ## Compiling
------------
+
 To make the basic version:
 ```
 cd src
@@ -48,54 +49,56 @@ make
 ```
 
 Some platforms have temperature sensors, power sensors, etc.
-Sensors for specific platforms (currently ODROID C2 and XU3) are supported
-and can be enabled by compiling with the 'odroid_c2' or 'odroid_xu3' option. 
+Sensors for specific platforms (currently ODROID C2 and XU3, and the Raspberry Pi 3) are supported
+and can be enabled by compiling with the 'odroid_c2', 'odroid_xu3', or `rpi3` option. 
 
 E.g. 
 ```
 make odroid_xu3
 ```
 
-Make sure a 'make clean' is done before compiling with a different option. 
+Make sure a `make clean` is done before compiling with a different option. 
 
 ## Enabling PMCs
---------------
 
 **IMPORTANT:** PMCs must be enabled after each reboot. 
 
-Go to enable_pmcs directory and make the kernel model (requires kernel source). 
+Go to the `enable_pmcs` directory and make the kernel modules (requires kernel source). 
 It works on ARMv7 and ARMv8 and with any CPU. 
-TODO: add more details on how to compile. 
-
-Can force a module to be loaded (**TODO:** add more details on this coming soon...).
-There is already a precompiled LKM for ARMv8 (`powmon-enable-pmcs.ko.precompiled.armv8`).
-This can be force loaded on ARMv8.
-
-There is not one (yet) for ARMv7, but there is a specific XU3 and XU4 
-precompiled LKM (`perf.ko.precompiled.xu3`). (Hardcoded as 8-core, taken from
-the [powmon](http://www.powmon.ecs.soton.ac.uk) online LKM).
-
-For XU3/XU4:
-```
-mv perf.ko.precompiled.xu3 perf.ko
+After compiling the LKM it can be loaded:
 ```
 sudo insmod perf.ko
+```
+
+If, for any reason, PMC access from userspace needs to be disabled:
+```
+sudo rmmod perf.ko
+```
+
+It should be possible to force-load (i.e. with `modprobe -f`, look online for documentation on this) one of the existing kernel modules if your existing kernel supports this. For ARMv7 use the [powmon-enable-pmcs.ko.rpi3-32](https://github.com/mattw200/gemstone-profiler-logger/blob/master/enable-pmcs/powmon-enable-pmcs.ko.rpi3-32) and for ARMv8 use [powmon-enable-pmcs.ko.precompiled.armv8](https://github.com/mattw200/gemstone-profiler-logger/blob/master/enable-pmcs/powmon-enable-pmcs.ko.precompiled.armv8) (rename them to `perf.ko`)
+
+If you are using the ODROID-XU3 or ODROID-XU4 board and the provided disk image from [Powmon](http://www.powmon.ecs.soton.ac.uk/powermodeling/) the
+n the pre-compiled `mv perf.ko.precompiled.xu3` can be used without any re-compilation or force-loading:
+```
+mv perf.ko.precompiled.xu3 perf.ko
+sudo insmod perf.ko
+```
 
 
 ## Usage - general
-------------------
 
 The original main purpose of this software is to record data for experiments 
-(e.g. logging the data in a raw format and post-processing later). 
+(e.g. logging the data in a raw format and post-processing later). The key steps 
+(assuming `perf.ko` has already been loaded) are:
 
 1. Select PMCs using the events.config file. 
 
    Each row represents a CPU type (e.g. Cortex-A7, Cortex-A53 etc.)
    The comma-separated fields in the row contain the CPUID_CODE 
-   (a unique number to identify the CPU, as per the CPUs Reference
+   (a unique number to identify the CPU, as per the CPU's Reference
    Manuals). This is the number the software uses to identify the CPU.
    The next field is the CPU name (this is just there for convenience
-   in identifying the CPU type, it is not used by the software. 
+   in identifying the CPU type, it is not used by the software). 
 
    The remaining columns are the PMC event numbers in hexadecimal format. 
 
@@ -131,13 +134,13 @@ The original main purpose of this software is to record data for experiments
    ./bin/pmc-get-header
    ```
 
-   The output is a tab-separated CSV file header row.
+   The output is a tab-separated CSV header row.
 
    As well as printing the header row of the results to follow, it also provides
    information on the platform and confirms the PMC event selection (they are 
    read back from hardware). An example of the output of this program is found 
    in the `header.example` file. Each PMC column heading looks like:
-   CPU 0 (id:0x07) cntr 3 (0x04)
+   CPU 0 (id:0x07) cntr 3 (0x04), where 
    - CPU 0: means it is CPU 0. 
    - (id:0x07): identifies the type of CPU (e.g. Cortex-A7 in this case). The 
      IDCODE is defined in the ARM Reference Manual for the CPU in question. 
@@ -184,13 +187,12 @@ The original main purpose of this software is to record data for experiments
 
    
 ## Usage - recording experiments
---------------------------------
 (Example)
  
   Create two output files: one for logging events, one for a continuous sample
   ```
   ./bin/pmc-setup
-  sudo ./bin/pmc-run 100000 > continuous.csv
+  sudo ./bin/pmc-run 100000 > continuous.csv &
   ./bin/pmc-get-header > events.csv
   ./bin/pmc-get-pmcs "basicmath start" >> events.csv
   /* RUN BASICMATH
@@ -199,14 +201,14 @@ The original main purpose of this software is to record data for experiments
   ```
   etc.
   
-  The results are in two tab-separated CSV files, ready to be post processed.
+  The results are in two tab-separated CSV files, ready to be post-processed.
   Note that if the pmc-run is stopped, the final sample (last line in csv file)
   may not have completed, and therefore may confuse software opening the csv
   file. Delete the last line of this file to solve this. 
   
 
 ## Usage - runtime data
-----------------------
+
 An example program has been created to provide run-time PMC output using the
 previously described programs. 
 
@@ -227,33 +229,8 @@ Note that if the pmc-runtime is stopped, the final sample (last line in csv file
 may not have completed, and therefore may confuse software opening the csv
 file. Delete the last line of this file to solve this. 
 
-## More Notes on Runtime Capture
--------------------------------
-The pmc-runtime program uses the existing logging applications and makes it
-work for runtime. (i.e. using the programs to output the numbers to file 
-(as text) and then reading it back, decoding, convert to float, etc.
-
-The overhead for runtime is therefore OK, but can be improved. 
-
-I required, it wouldn't be too much work to make a new program for run-time 
-from the bottom up, using the existing code but combining it together. The 
-interface would be the same, just the way it works in the background different. 
-
-The key to 'runtime' is that the PMCs need to be sampled twice, and then the rate
-calculated over the sample period. (not just instantaneous reading). (For
-datalogging this is done in post-processing). Therefore the program needs to 
-store the PMC values of the last cycle. The pmc-get-pmcs (used by pmc-runtime)
-derives the number of counters per CPU at runtime using the CPU registers (more
-efficient for datalogging). However, when a core is offline, it falls back on 
-using the cpu-data.csv, created by pmc-setup, which stores the number of 
-counters per CPU (and the number of CPUs). This could be used to make a data
-structure to hold the counter values between samples. This wouldn't take long 
-if it is required and the interface would remain unchanged. Even better (in 
-terms of efficiency), the runtime could use the code directly and be compiled 
-together (i.e. no writing to file and reading back). 
-
 ## Authors
-----------
+
 [Matthew J. Walker](mailto:mw9g09@ecs.soton.ac.uk) - [University of Southampton](https://www.southampton.ac.uk)
 
 This project supports the paper:
@@ -267,6 +244,6 @@ This work is supported by [Arm Research](https://developer.arm.com/research),
 
 
 ## License
-----------
+
 This project is licensed under the 3-clause BSD license. See LICENSE.md for details.
 
