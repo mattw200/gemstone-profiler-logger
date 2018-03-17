@@ -77,8 +77,8 @@ sudo rmmod perf.ko
 
 It should be possible to force-load (i.e. with `modprobe -f`, look online for documentation on this) one of the existing kernel modules if your existing kernel supports this. For ARMv7 use the [powmon-enable-pmcs.ko.rpi3-32](https://github.com/mattw200/gemstone-profiler-logger/blob/master/enable-pmcs/powmon-enable-pmcs.ko.rpi3-32) and for ARMv8 use [powmon-enable-pmcs.ko.precompiled.armv8](https://github.com/mattw200/gemstone-profiler-logger/blob/master/enable-pmcs/powmon-enable-pmcs.ko.precompiled.armv8) (rename them to `perf.ko`)
 
-If you are using the ODROID-XU3 or ODROID-XU4 board and the provided disk image from [Powmon](http://www.powmon.ecs.soton.ac.uk/powermodeling/) the
-n the pre-compiled `mv perf.ko.precompiled.xu3` can be used without any re-compilation or force-loading:
+If you are using the ODROID-XU3 or ODROID-XU4 board and the provided disk image from [Powmon](http://www.powmon.ecs.soton.ac.uk/powermodeling/) then 
+ the pre-compiled `perf.ko.precompiled.xu3` can be used without any re-compilation or force-loading:
 ```
 mv perf.ko.precompiled.xu3 perf.ko
 sudo insmod perf.ko
@@ -87,7 +87,7 @@ sudo insmod perf.ko
 
 ## Usage - general
 
-The original main purpose of this software is to record data for experiments 
+The main purpose of this software is to record data for experiments 
 (e.g. logging the data in a raw format and post-processing later). The key steps 
 (assuming `perf.ko` has already been loaded) are:
 
